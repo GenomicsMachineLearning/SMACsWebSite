@@ -1,0 +1,47 @@
+{
+  "Brain": {
+    "samples": 12,
+    "proportions": {
+      "Neurons": 0.45,
+      "Microglia": 0.15,
+      "Astrocytes": 0.25,
+      "Oligodendrocytes": 0.15
+    }
+  },
+  "Heart": {
+    "samples": 8,
+    "proportions": {
+      "Cardiomyocytes": 0.60,
+      "Fibroblasts": 0.20,
+      "Endothelial": 0.15,
+      "Immune": 0.05
+    }
+  },
+  "Liver": {
+    "samples": 10,
+    "proportions": {
+      "Hepatocytes": 0.70,
+      "Kupffer Cells": 0.10,
+      "Endothelial": 0.15,
+      "Stellate Cells": 0.05
+    }
+  },
+  "Spleen": {
+    "samples": 9,
+    "proportions": {
+      "B Cells": 0.40,
+      "T Cells": 0.35,
+      "Macrophages": 0.15,
+      "Other": 0.10
+    }
+  },
+  "Kidney": {
+    "samples": 11,
+    "proportions": {
+      "Podocytes": 0.10,
+      "Tubule Cells": 0.60,
+      "Endothelial": 0.20,
+      "Fibroblasts": 0.10
+    }
+  }
+}
