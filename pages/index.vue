@@ -71,7 +71,7 @@
                 
                 <!-- Cursor Tooltip -->
                 <div v-show="hoveredOrganName" 
-                     class="fixed z-50 bg-black/90 text-black text-xs font-bold px-2 py-1 rounded shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
+                     class="fixed z-50 bg-white/80 text-gray-900 backdrop-blur-sm text-xs font-bold px-2 py-1 rounded shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
                      :style="{ left: cursorX + 'px', top: (cursorY - 10) + 'px' }">
                     {{ hoveredOrganName }}
                 </div>
