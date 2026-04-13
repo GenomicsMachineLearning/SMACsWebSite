@@ -11,12 +11,15 @@
 
     <div class="flex flex-col md:flex-row max-w-7xl w-full mt-6 px-6 gap-6 flex-grow">
       
-      <!-- LEFT SIDEBAR: Controls (Only for Visualiser/LR DB) -->
-      <aside v-if="activeTab !== 'about'" class="w-full md:w-80 bg-white p-6 rounded-xl shadow-lg border border-gray-100 flex-shrink-0 self-start">
+      <!-- LEFT SIDEBAR: Controls (Only for Visualiser/Search) -->
+      <aside v-if="activeTab !== 'home'" class="w-full md:w-80 bg-white p-6 rounded-xl shadow-lg border border-gray-100 flex-shrink-0 self-start">
         
         <!-- VISUALISER CONTROLS -->
         <div v-if="activeTab === 'visualiser'">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Visualiser Settings</h2>
+            <h2 class="text-lg font-bold text-gray-800 mb-2 border-b pb-2">DEGs and DELRs on Tissue</h2>
+            <p class="text-xs text-gray-600 mb-4 bg-blue-50 p-2 rounded border border-blue-100">
+                Choose a Technology and Mode, select a Gene/Interaction, and click on an Organ from the mouse model below to visualize the spatial expression comparing Young and Aged.
+            </p>
             
             <!-- Technology -->
             <div class="mb-6">
@@ -137,11 +140,11 @@
              </div>
         </div>
 
-        <!-- LR DATABASE CONTROLS -->
-        <div v-if="activeTab === 'lr_database'">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Database Filter</h2>
+        <!-- SEARCH CONTROLS -->
+        <div v-if="activeTab === 'search_genes' || activeTab === 'search_lrs'">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Instructions for Search</h2>
             <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 mb-4">
-                Explore the Ligand-Receptor interactions database.
+                Select a category in the main window to search through our database of specific aging markers and interactions.
             </div>
         </div>
 
@@ -153,29 +156,114 @@
          <!-- TABS HEADER -->
          <div class="flex border-b bg-gray-50">
              <button 
-                @click="activeTab = 'about'"
-                :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'about' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
+                @click="activeTab = 'home'"
+                :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'home' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
              >
-                ABOUT
+                HOME
              </button>
              <button 
                 @click="activeTab = 'visualiser'"
                 :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'visualiser' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
              >
-                VISUALISER
+                DEGs & DELRs ON TISSUE
              </button>
              <button 
-                @click="activeTab = 'lr_database'"
-                :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'lr_database' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
+                @click="activeTab = 'search_genes'; selectedCategory = null; searchDataHeaders = []; searchDataResults = []"
+                :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'search_genes' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
              >
-                LR DATABASE
+                DIFFERENTIAL GENES
+             </button>
+             <button 
+                @click="activeTab = 'search_lrs'; selectedCategory = null; searchDataHeaders = []; searchDataResults = []"
+                :class="['flex-1 py-4 text-center font-semibold text-sm focus:outline-none transition-all', activeTab === 'search_lrs' ? 'bg-white text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
+             >
+                DIFFERENTIAL LRS
              </button>
          </div>
 
-         <!-- TAB CONTENT: ABOUT -->
-         <div v-if="activeTab === 'about'" class="flex-grow flex flex-col items-center justify-between p-8 bg-white overflow-y-auto">
-             <div class="w-full max-w-4xl flex flex-col items-center">
-                 <img src="/SMACs_WebApp.png" alt="SMACs Methodology" class="max-w-full h-auto drop-shadow-lg mb-8" />
+         <!-- TAB CONTENT: HOME -->
+         <div v-if="activeTab === 'home'" class="flex-grow flex flex-col items-center justify-between p-8 bg-white overflow-y-auto">
+             <div class="w-full max-w-6xl flex flex-col items-center gap-12 mb-8">
+                 <div class="flex flex-col md:flex-row w-full items-center gap-8">
+                     <div class="w-full md:w-1/4 flex justify-center">
+                         <img src="/SMACs_WebApp_1.png" alt="SMACs Methodology Portrait" class="max-w-full h-auto rounded-lg object-contain" />
+                     </div>
+                     <div class="w-full md:w-2/3 text-gray-700 text-lg leading-relaxed text-justify">
+                         Aging drives systemic functional decline through cell-type- and organ-specific mechanisms. Cell-cell interaction networks within one organ and across organs change with aging, but have not been systematically studied. Here, we leverage information of spatial proximity, ligand-receptor (LR) coexpression, and cell-type co-localisation to accurately map the interactions across five organs and identify changes  between young and aged groups. We generated data from two whole-transcriptome spatial technologies at different spatial resolutions to compare CCI and identify aging-associated interaction pathways across organs. Data from five independent external mouse datasets were used to validate the results. We found increased interactions associated with immune activation, inflammation, and cytokine signalling in aged mice, whereas young mice were enriched for interactions in Wnt signalling differentiation, stemness, regeneration, and tissue homeostasis. Notably, aging-associated LR interactions shared across organs were linked to immune cell recruitment. Spatial mapping of these interactions further identified regions with increased immune interactions, predominantly between immune and organ-resident cells, showing that CCI events collectively orchestrated the inflammatory landscape of the aging organs. Furthermore, using a knowledge graph, we identified associations between multi-organ aging LR genes,  age-related diseases, and corresponding drug targets.
+                     </div>
+                 </div>
+                 
+                 <div class="w-full flex justify-center flex-col shadow-lg border border-gray-100 items-center">
+                     <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Multi-organ conserved aging LR pairs</h2>
+                     <img src="/SMACs_WebApp_2.png" alt="SMACs Methodology Landscape" class="max-w-full h-auto drop-shadow-lg rounded-lg" />
+                 </div>
+
+                 <div class="w-full mt-12 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">In-house Multi-organ data</h2>
+                     <p class="text-center text-gray-600 mb-8">Select an organ to explore its data quality and replicate statistics.</p>
+                     
+                     <div class="flex flex-wrap justify-center gap-4 mb-10">
+                         <button v-for="org in ['Brain', 'Heart', 'Kidney', 'Liver', 'Spleen']" 
+                            :key="org" 
+                            @click="fetchExploreStats(org)"
+                            :class="['px-6 py-2 rounded-full font-semibold transition-all', selectedExploreOrgan === org ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-blue-100']"
+                         >
+                             {{ org }}
+                         </button>
+                     </div>
+                     
+                     <div v-if="loadingExplore" class="text-center text-blue-500 my-10 animate-pulse">
+                         Loading organ metadata...
+                     </div>
+                     
+                     <div v-else-if="exploreSummary" class="fade-in">
+                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-gray-50 p-6 rounded-lg">
+                             <div class="text-center">
+                                 <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Total Samples</div>
+                                 <div class="text-3xl font-bold text-blue-600">{{ exploreSummary.total_samples }}</div>
+                             </div>
+                             <div class="text-center">
+                                 <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Aged Yes</div>
+                                 <div class="text-3xl font-bold text-red-500">{{ exploreSummary.aged_samples }}</div>
+                             </div>
+                             <div class="text-center">
+                                 <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Aged No</div>
+                                 <div class="text-3xl font-bold text-blue-500">{{ exploreSummary.young_samples }}</div>
+                             </div>
+                             <div class="text-center">
+                                 <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Total Cells</div>
+                                 <div class="text-3xl font-bold text-purple-600">{{ exploreSummary.total_cells }}</div>
+                             </div>
+                         </div>
+                         
+                         <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Average Data Quality (nFeature_Spatial) per Sample</h3>
+                         <div class="space-y-3 max-h-96 overflow-y-auto pr-4">
+                             <div v-for="stat in exploreStats" :key="stat.orig_ident_2" class="flex items-center gap-4 text-sm">
+                                 <div class="w-48 truncate font-medium text-gray-700" :title="stat.orig_ident_2">
+                                     {{ stat.orig_ident_2 }}
+                                 </div>
+                                 <div class="w-16 text-center">
+                                     <span :class="['px-2 py-1 text-xs rounded-full font-bold', stat.aged === 'Yes' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700']">
+                                         {{ stat.aged === 'Yes' ? 'Aged' : 'Young' }}
+                                     </span>
+                                 </div>
+                                 <div class="w-20 text-center">
+                                     <span :class="['px-2 py-1 text-xs rounded-md font-semibold border', stat.isVisium ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-orange-50 text-orange-700 border-orange-200']">
+                                         {{ stat.isVisium ? 'Visium' : 'STOmics' }}
+                                     </span>
+                                 </div>
+                                 <div class="flex-grow bg-gray-100 h-6 rounded-md overflow-hidden relative border border-gray-200">
+                                     <!-- Max is around 10000 roughly -->
+                                     <div :class="['h-full transition-all', stat.aged === 'Yes' ? 'bg-red-400' : 'bg-blue-400']" :style="{ width: Math.min((stat.nFeature_Spatial / 8000) * 100, 100) + '%' }"></div>
+                                     <span class="absolute right-2 top-1 text-xs font-bold text-gray-800 drop-shadow-sm mix-blend-difference">{{ Math.round(stat.nFeature_Spatial) }} features</span>
+                                 </div>
+                                 <div class="w-24 text-right text-gray-500 text-xs tabular-nums">
+                                    {{ stat.cell_count }} cells
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
              </div>
              
              <!-- Footer -->
@@ -195,8 +283,12 @@
          <!-- TAB CONTENT: VISUALISER -->
          <div v-if="activeTab === 'visualiser'" class="flex-grow p-8 flex flex-col items-center bg-gray-50/50 overflow-y-auto relative">
              
-             <div v-if="!selectedOrgan || !selectedTech" class="text-center text-gray-400 mt-20">
-                <div class="mb-4">Select an <b>Organ</b> and <b>Technology</b> from the sidebar to start.</div>
+             <div v-if="!selectedOrgan || !selectedTech" class="text-center mt-20 p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <h3 class="text-xl font-bold text-gray-700 mb-2">Ready to Visualize</h3>
+                <div class="text-gray-700 mb-4">
+                    Please use the sidebar controls to select your desired <b>Technology</b> and <b>Mode</b>. 
+                    Then click a colored node on the <b>mouse</b> to preview the tissue plots.
+                </div>
              </div>
              
              <!-- Loading State: Show Spinner -->
@@ -245,47 +337,100 @@
              </div>
          </div>
 
-         <!-- TAB CONTENT: LR DATABASE -->
-         <div v-if="activeTab === 'lr_database'" class="flex-grow p-8 flex flex-col">
+         <!-- TAB CONTENT: SEARCH DIFFERENTIAL GENES and LRS -->
+         <div v-if="activeTab === 'search_genes' || activeTab === 'search_lrs'" class="flex-grow p-8 flex flex-col">
              
-             <!-- Search Bar -->
-             <div class="mb-6 relative">
-                 <input 
-                    v-model="searchQuery" 
-                    @keyup.enter="searchLR"
-                    placeholder="Search for a gene (e.g. Gdf15)..." 
-                    class="w-full p-4 pl-12 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
-                 >
-                 <svg class="w-6 h-6 text-gray-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                 <button @click="searchLR" class="absolute right-3 top-3 bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">Search</button>
+             <!-- Search Categories for Genes (2 Boxes) -->
+             <div v-if="activeTab === 'search_genes'" class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8">
+                 <div @click="selectCategory('organ_genes')" :class="['cursor-pointer border rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-lg', selectedCategory === 'organ_genes' ? 'bg-blue-50 border-blue-500 shadow-md transform scale-105' : 'bg-white hover:border-blue-300']">
+                     <span class="text-sm font-bold text-gray-800 mb-2 leading-tight">Organ-specific<br>Genes</span>
+                     <img src="/Search_Database_1_3.png" alt="Organ Genes" class="w-25 h-30 object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'80\\\' height=\\\'100\\\'%3E%3Crect width=\\\'100%25\\\' height=\\\'100%25\\\' fill=\\\'%23f3f4f6\\\'/%3E%3Ctext x=\\\'50%25\\\' y=\\\'50%25\\\' dominant-baseline=\\\'middle\\\' text-anchor=\\\'middle\\\' font-family=\\\'sans-serif\\\' font-size=\\\'12px\\\' fill=\\\'%239ca3af\\\'%3EImage%3C/text%3E%3C/svg%3E'"/>
+                 </div>
+                 <div @click="selectCategory('cell_type_degs')" :class="['cursor-pointer border rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-lg', selectedCategory === 'cell_type_degs' ? 'bg-blue-50 border-blue-500 shadow-md transform scale-105' : 'bg-white hover:border-blue-300']">
+                     <span class="text-sm font-bold text-gray-800 mb-2 leading-tight">Cell-type-specific<br>DEGs</span>
+                     <img src="/Search_Database_2.png" alt="Cell DEGs" class="w-25 h-30 object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'80\\\' height=\\\'100\\\'%3E%3Crect width=\\\'100%25\\\' height=\\\'100%25\\\' fill=\\\'%23f3f4f6\\\'/%3E%3Ctext x=\\\'50%25\\\' y=\\\'50%25\\\' dominant-baseline=\\\'middle\\\' text-anchor=\\\'middle\\\' font-family=\\\'sans-serif\\\' font-size=\\\'12px\\\' fill=\\\'%239ca3af\\\'%3EImage%3C/text%3E%3C/svg%3E'"/>
+                 </div>
              </div>
 
-             <!-- Results Table -->
-             <div class="flex-grow overflow-auto border rounded-lg bg-white shadow-sm" v-if="searchResults && searchResults.length > 0">
-                 <table class="min-w-full divide-y divide-gray-200">
-                     <thead class="bg-gray-50">
-                         <tr>
-                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ligand</th>
-                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receptor</th>
-                         </tr>
-                     </thead>
-                     <tbody class="bg-white divide-y divide-gray-200">
-                         <tr v-for="(row, idx) in searchResults" :key="idx" class="hover:bg-gray-50">
-                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ row['Ligand.gene.symbol'] }}</td>
-                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ row['Receptor.gene.symbol'] }}</td>
-                         </tr>
-                     </tbody>
-                 </table>
+             <!-- Search Categories for LRs (2 Boxes) -->
+             <div v-if="activeTab === 'search_lrs'" class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8">
+                 <div @click="selectCategory('de_lr_pairs')" :class="['cursor-pointer border rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-lg', selectedCategory === 'de_lr_pairs' ? 'bg-blue-50 border-blue-500 shadow-md transform scale-105' : 'bg-white hover:border-blue-300']">
+                     <span class="text-sm font-bold text-gray-800 mb-2 leading-tight">Differentially Expressed<br>LR pairs</span>
+                     <img src="/Search_Database_1_3.png" alt="DE LR Paris" class="w-25 h-30 object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'80\\\' height=\\\'100\\\'%3E%3Crect width=\\\'100%25\\\' height=\\\'100%25\\\' fill=\\\'%23f3f4f6\\\'/%3E%3Ctext x=\\\'50%25\\\' y=\\\'50%25\\\' dominant-baseline=\\\'middle\\\' text-anchor=\\\'middle\\\' font-family=\\\'sans-serif\\\' font-size=\\\'12px\\\' fill=\\\'%239ca3af\\\'%3EImage%3C/text%3E%3C/svg%3E'"/>
+                 </div>
+                 <div @click="selectCategory('conserved_lr_pairs')" :class="['cursor-pointer border rounded-lg p-6 flex flex-col items-center justify-center text-center transition-all hover:shadow-lg', selectedCategory === 'conserved_lr_pairs' ? 'bg-blue-50 border-blue-500 shadow-md transform scale-105' : 'bg-white hover:border-blue-300']">
+                     <span class="text-sm font-bold text-gray-800 mb-2 leading-tight">Conserved Aging<br>Multi-organ LR</span>
+                     <img src="/Search_Database_4.png" alt="Conserved LR Pairs" class="w-20 h-24 object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'80\\\' height=\\\'100\\\'%3E%3Crect width=\\\'100%25\\\' height=\\\'100%25\\\' fill=\\\'%23f3f4f6\\\'/%3E%3Ctext x=\\\'50%25\\\' y=\\\'50%25\\\' dominant-baseline=\\\'middle\\\' text-anchor=\\\'middle\\\' font-family=\\\'sans-serif\\\' font-size=\\\'12px\\\' fill=\\\'%239ca3af\\\'%3EImage%3C/text%3E%3C/svg%3E'"/>
+                 </div>
+             </div>
+
+             <!-- Search Interface (Shows only if a category is selected) -->
+             <div v-if="selectedCategory" class="flex-grow flex flex-col">
+                 <!-- Species Toggle for DE LR Pairs -->
+                 <div v-if="selectedCategory === 'de_lr_pairs'" class="mb-4 flex gap-4 items-center bg-gray-50 p-3 rounded-lg border border-gray-100 w-max">
+                     <span class="text-sm font-bold text-gray-700 mr-2 text-transform uppercase">Organism:</span>
+                     <label class="flex items-center cursor-pointer">
+                         <input type="radio" value="mouse" v-model="speciesContext" @change="searchCategoryData" class="text-blue-600 focus:ring-blue-500 h-4 w-4 border-gray-300">
+                         <span class="ml-2 text-gray-700 font-medium">Mouse</span>
+                     </label>
+                     <label class="flex items-center cursor-pointer">
+                         <input type="radio" value="human" v-model="speciesContext" @change="searchCategoryData" class="text-blue-600 focus:ring-blue-500 h-4 w-4 border-gray-300">
+                         <span class="ml-2 text-gray-700 font-medium">Human</span>
+                     </label>
+                 </div>
+
+                 <!-- Search Bar -->
+                 <div class="mb-6 relative">
+                     <input 
+                        v-model="searchQuery" 
+                        @keyup.enter="searchCategoryData"
+                        placeholder="Search for a gene or feature..." 
+                        class="w-full p-4 pl-12 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
+                     >
+                     <svg class="w-6 h-6 text-gray-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                     <button @click="searchCategoryData" class="absolute right-3 top-3 bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition">Search</button>
+                 </div>
+
+                 <!-- Results Table -->
+                 <div class="flex-grow overflow-auto border rounded-lg bg-white shadow-sm" v-if="searchDataHeaders.length > 0 && searchDataResults.length > 0">
+                     <table class="min-w-full divide-y divide-gray-200">
+                         <thead class="bg-gray-50 sticky top-0">
+                             <tr>
+                                 <th v-for="header in searchDataHeaders" :key="header" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {{ header.replace('.', ' ').replace('_', ' ') }}
+                                 </th>
+                             </tr>
+                         </thead>
+                         <tbody class="bg-white divide-y divide-gray-200">
+                             <tr v-for="(row, idx) in searchDataResults" :key="idx" class="hover:bg-gray-50">
+                                 <td v-for="header in searchDataHeaders" :key="header" class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                     <div v-if="typeof row[header] === 'number'">{{ Number.isInteger(row[header]) ? row[header] : row[header].toFixed(4) }}</div>
+                                     <div v-else>{{ row[header] }}</div>
+                                 </td>
+                             </tr>
+                         </tbody>
+                     </table>
+                 </div>
+                 
+                 <div v-else-if="isLoadingSearch" class="text-center text-blue-500 mt-10 animate-pulse font-medium">
+                     Loading {{ totalMatches !== null && totalMatches > 0 ? 'Results...' : 'Data...' }} 
+                 </div>
+                 
+                 <div v-else-if="hasSearchedData" class="text-center text-gray-500 mt-10">
+                     No results found for "{{ lastQuery }}" in this category.
+                 </div>
+                 
+                 <div v-if="totalMatches !== null && !isLoadingSearch && totalMatches > 100" class="text-xs text-center text-gray-500 mt-2 bg-gray-50 p-2 rounded">
+                     Showing top 100 out of {{ totalMatches }} records. Please use the search bar to refine.
+                 </div>
              </div>
              
-             <div v-else-if="hasSearched" class="text-center text-gray-500 mt-10">
-                 No results found for "{{ lastQuery }}".
+             <div v-else class="text-center text-gray-400 mt-10 flex-grow flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                 <div>
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                    <span>Click on a category above to load its data table.</span>
+                 </div>
              </div>
-
-             <div v-else class="text-center text-gray-400 mt-10">
-                 Type a gene name above to search the database.
-             </div>
-
          </div>
 
       </main>
@@ -298,7 +443,7 @@
 export default {
   data() {
     return {
-      activeTab: 'about', // Default to About
+      activeTab: 'home', // Default to Home
       technologies: ['Visium', 'STOmics'],
       
       // Visualiser State
@@ -317,11 +462,22 @@ export default {
       cursorX: 0,
       cursorY: 0,
 
-      // LR Database State
+      // Search Tab State
+      selectedCategory: null,
+      speciesContext: 'mouse',
       searchQuery: '',
       lastQuery: '',
-      searchResults: null,
-      hasSearched: false
+      searchDataResults: [],
+      searchDataHeaders: [],
+      hasSearchedData: false,
+      isLoadingSearch: false,
+      totalMatches: null,
+
+      selectedExploreOrgan: null,
+      loadingExplore: false,
+      exploreStats: null,
+      exploreSummary: null,
+
     }
   },
   mounted() {
@@ -404,19 +560,75 @@ export default {
         this.loadingPlots = false;
       }
     },
-    async searchLR() {
-        if (!this.searchQuery) return;
-        this.hasSearched = true;
+    selectCategory(category) {
+        this.selectedCategory = category;
+        this.searchQuery = '';
+        this.searchCategoryData();
+    },
+
+    async fetchExploreStats(organ) {
+        this.selectedExploreOrgan = organ;
+        this.loadingExplore = true;
+        this.exploreStats = null;
+        this.exploreSummary = null;
+        try {
+            const response = await this.$axios.get('/explore_organ', {
+                params: {
+                    organ: organ
+                }
+            });
+            // Format stats a bit
+            this.exploreStats = response.data.stats.map(s => ({
+                orig_ident_2: s['orig.ident_2'] || s['index'] || 'Unknown',
+                aged: s.aged,
+                nFeature_Spatial: s.nFeature_Spatial,
+                cell_count: s.cell_count,
+                tech_org: s.tech_org,
+                isVisium: s.tech_org && s.tech_org.includes('VLP')
+            })).sort((a,b) => {
+                if(a.aged === 'Yes' && b.aged !== 'Yes') return 1;
+                if(a.aged !== 'Yes' && b.aged === 'Yes') return -1;
+                return b.nFeature_Spatial - a.nFeature_Spatial;
+            });
+            this.exploreSummary = response.data.summary;
+        } catch (err) {
+            console.error("Error fetching explore stats:", err);
+            this.exploreSummary = { total_samples: 0, aged_samples: 0, young_samples: 0, total_cells: 0 };
+            this.exploreStats = [];
+        } finally {
+            this.loadingExplore = false;
+        }
+    },
+    async searchCategoryData() {
+        if (!this.selectedCategory) return;
+        this.hasSearchedData = true;
         this.lastQuery = this.searchQuery;
+        this.isLoadingSearch = true;
+        this.searchDataHeaders = [];
+        this.searchDataResults = [];
         
         try {
-            const response = await this.$axios.get('/search_lr', {
-                params: { query: this.searchQuery }
+            const response = await this.$axios.get('/data_search', {
+                params: { 
+                    category: this.selectedCategory, 
+                    query: this.searchQuery,
+                    species: this.speciesContext
+                }
             });
-            this.searchResults = response.data;
+            this.searchDataResults = response.data.results;
+            this.totalMatches = response.data.total_matches;
+            
+            if (this.searchDataResults.length > 0) {
+                // Ignore empty keys or index columns
+                let keys = Object.keys(this.searchDataResults[0]);
+                this.searchDataHeaders = keys.filter(k => k && k !== 'Unnamed: 0' && k !== 'X');
+            }
         } catch(err) {
-            console.error(err);
-            this.searchResults = [];
+            console.error("Error searching data:", err);
+            this.searchDataResults = [];
+            this.totalMatches = 0;
+        } finally {
+            this.isLoadingSearch = false;
         }
     }
   }
