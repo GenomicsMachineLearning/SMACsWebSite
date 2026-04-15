@@ -384,6 +384,7 @@
                      <input 
                         v-model="searchQuery" 
                         @keyup.enter="searchCategoryData"
+                        @input="debounceSearch"
                         placeholder="Search for a gene or feature..." 
                         class="w-full p-4 pl-12 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
                      >
@@ -630,6 +631,14 @@ export default {
         } finally {
             this.isLoadingSearch = false;
         }
+    },
+    debounceSearch() {
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+        this.searchTimeout = setTimeout(() => {
+            this.searchCategoryData();
+        }, 300);
     }
   }
 }
